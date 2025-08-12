@@ -70,7 +70,7 @@
 
 ### 1. **Clone and Setup**
 ```bash
-git clone https://github.com/your-username/ecommerce-api.git
+git clone https://github.com/CristianZArellano/ecomerce_api_fast_API.git
 cd ecommerce-api
 
 # Copy environment file
