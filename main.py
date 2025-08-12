@@ -62,10 +62,11 @@ async def lifespan(app: FastAPI):
     await redis_client.connect()
     logger.info("Redis connected")
 
-    log_business_event(logger, "service_started", {
-        "version": settings.APP_VERSION,
-        "environment": settings.APP_ENV
-    })
+    log_business_event(
+        logger,
+        "service_started",
+        {"version": settings.APP_VERSION, "environment": settings.APP_ENV},
+    )
 
     yield
 
@@ -114,35 +115,20 @@ app = FastAPI(
     contact={
         "name": "API Support",
         "email": "support@ecommerce-api.com",
-        "url": "https://github.com/your-repo/ecommerce-api"
+        "url": "https://github.com/CristianZArellano/ecomerce_api_fast_API.git",
     },
-    license_info={
-        "name": "MIT License",
-        "url": "https://opensource.org/licenses/MIT"
-    },
+    license_info={"name": "MIT License", "url": "https://opensource.org/licenses/MIT"},
     terms_of_service="https://your-domain.com/terms",
     openapi_tags=[
         {
             "name": "auth",
             "description": "🔐 Autenticación y autorización",
         },
-        {
-            "name": "users",
-            "description": "👥 Gestión de usuarios"
-        },
-        {
-            "name": "products",
-            "description": "🛍️ Gestión de productos"
-        },
-        {
-            "name": "stats",
-            "description": "📊 Estadísticas y métricas"
-        },
-        {
-            "name": "health",
-            "description": "🏥 Health checks y monitoreo"
-        }
-    ]
+        {"name": "users", "description": "👥 Gestión de usuarios"},
+        {"name": "products", "description": "🛍️ Gestión de productos"},
+        {"name": "stats", "description": "📊 Estadísticas y métricas"},
+        {"name": "health", "description": "🏥 Health checks y monitoreo"},
+    ],
 )
 
 
@@ -156,7 +142,7 @@ def custom_openapi():
         version=app.version,
         description=app.description,
         routes=app.routes,
-        tags=app.openapi_tags
+        tags=app.openapi_tags,
     )
 
     # Configurar esquema de seguridad
@@ -165,7 +151,7 @@ def custom_openapi():
             "type": "http",
             "scheme": "bearer",
             "bearerFormat": "JWT",
-            "description": "JWT token obtenido del endpoint /auth/login"
+            "description": "JWT token obtenido del endpoint /auth/login",
         }
     }
 
@@ -177,8 +163,8 @@ def custom_openapi():
                 "name": "Juan Pérez",
                 "email": "juan@example.com",
                 "is_active": True,
-                "is_admin": False
-            }
+                "is_admin": False,
+            },
         },
         "ProductExample": {
             "summary": "Producto ejemplo",
@@ -188,9 +174,9 @@ def custom_openapi():
                 "price": 1299.99,
                 "stock": 10,
                 "category": "Electronics",
-                "sku": "LAP-001"
-            }
-        }
+                "sku": "LAP-001",
+            },
+        },
     }
 
     app.openapi_schema = openapi_schema
@@ -208,7 +194,7 @@ elif settings.APP_ENV == "production":
     cors_origins = [
         "https://yourdomain.com",
         "https://www.yourdomain.com",
-        "https://app.yourdomain.com"
+        "https://app.yourdomain.com",
     ]
 
 app.add_middleware(
@@ -217,7 +203,7 @@ app.add_middleware(
     allow_credentials=True,
     allow_methods=["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
     allow_headers=["*"],
-    expose_headers=["X-Request-ID", "X-Response-Time", "X-RateLimit-*"]
+    expose_headers=["X-Request-ID", "X-Response-Time", "X-RateLimit-*"],
 )
 
 # Agregar middlewares en orden correcto
@@ -233,10 +219,11 @@ app.include_router(health_router)
 # ============= ENDPOINTS BÁSICOS =============
 
 
-@app.get("/",
+@app.get(
+    "/",
     summary="🏠 Página principal",
     description="Endpoint de bienvenida con información básica de la API",
-    response_description="Información de bienvenida y características"
+    response_description="Información de bienvenida y características",
 )
 async def root():
     """Página principal de la API"""
@@ -251,24 +238,23 @@ async def root():
             "📊 Logging estructurado JSON",
             "🔒 Security headers y CORS",
             "📈 Health checks profesionales",
-            "🐳 Docker ready"
+            "🐳 Docker ready",
         ],
         "documentation": "/docs",
-        "health": "/health"
+        "health": "/health",
     }
-
-
 
 
 # ============= ENDPOINTS DE AUTENTICACIÓN =============
 
 
-@app.post("/auth/register",
+@app.post(
+    "/auth/register",
     response_model=schemas.User,
     tags=["auth"],
     summary="👤 Registrar usuario",
     description="Crear una nueva cuenta de usuario en el sistema",
-    response_description="Usuario creado exitosamente"
+    response_description="Usuario creado exitosamente",
 )
 async def register_user(
     user: schemas.UserRegister, db: AsyncSession = Depends(get_database)
