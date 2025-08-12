@@ -1,0 +1,15 @@
+# Core FastAPI
+fastapi==0.116.1
+uvicorn==0.35.0
+
+# Base de datos
+SQLAlchemy==2.0.43
+asyncpg==0.29.0
+psycopg2-binary==2.9.10
+
+# Validaciones
+pydantic==2.11.7
+email-validator==2.2.0
+
+# Configuraciones
+pydantic-settings==2.7.0
