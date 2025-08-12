@@ -50,12 +50,14 @@ jobs:
         with:
           python-version: ${{ env.PYTHON_VERSION }}
           cache: 'pip'
+          cache-dependency-path: |
+            requirements.txt
+            requirements-dev.txt
 
       - name: 📦 Install Dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install -r requirements.txt
-          pip install pytest pytest-asyncio pytest-cov httpx
+          pip install -r requirements-dev.txt
 
       - name: 🔧 Setup Test Environment
         run: |

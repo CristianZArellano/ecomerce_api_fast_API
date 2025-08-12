@@ -100,6 +100,9 @@ source .venv/bin/activate  # Linux/Mac
 # Install dependencies
 pip install -r requirements.txt
 
+# For development (includes testing and linting tools)
+pip install -r requirements-dev.txt
+
 # Start PostgreSQL & Redis (via Docker)
 docker-compose up -d postgres redis
 
