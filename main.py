@@ -18,7 +18,11 @@ from app.auth import (
 )
 from app.config import get_settings
 from app.database import Base, engine, get_database
-from app.exceptions import *
+from app.exceptions import (
+    RateLimitException,
+    UserAlreadyExistsException,
+    ValidationException,
+)
 from app.health import router as health_router
 from app.logging_config import get_logger, log_business_event, setup_logging
 from app.middleware import (
@@ -77,10 +81,10 @@ app = FastAPI(
     version=settings.APP_VERSION,
     description="""
     ## 🚀 Professional E-commerce API
-    
-    Una API completa de e-commerce con características avanzadas de seguridad, 
+
+    Una API completa de e-commerce con características avanzadas de seguridad,
     caching, rate limiting y logging estructurado.
-    
+
     ### ✨ Características principales:
     - 🔐 **JWT Authentication** con refresh tokens
     - 🛡️ **Rate limiting** inteligente con Redis
@@ -89,13 +93,13 @@ app = FastAPI(
     - 🔒 **Security headers** y CORS configurado
     - 📈 **Health checks** avanzados
     - 🐳 **Docker ready** con docker-compose
-    
+
     ### 🔑 Autenticación:
     1. Registra un usuario en `/auth/register`
     2. Inicia sesión en `/auth/login` para obtener tokens
     3. Usa el `access_token` en el header: `Authorization: Bearer {token}`
     4. Renueva tokens con `/auth/refresh`
-    
+
     ### 🛍️ Endpoints principales:
     - **Autenticación**: `/auth/*`
     - **Usuarios**: `/users/*`
@@ -278,8 +282,8 @@ async def register_user(
         return await crud.create_user(db=db, user=user_create)
     except ValueError as e:
         if "Email ya registrado" in str(e):
-            raise UserAlreadyExistsException(email=user.email)
-        raise ValidationException(message=str(e))
+            raise UserAlreadyExistsException(email=user.email) from e
+        raise ValidationException(message=str(e)) from e
 
 
 @app.post("/auth/login", response_model=schemas.TokenResponse)
