@@ -1,0 +1,91 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "api-ecommerce"
+version = "1.0.0"
+description = "API E-commerce con FastAPI y PostgreSQL"
+authors = [
+    {name = "Cristian Arellano", email = "cristian@ejemplo.com"},
+]
+dependencies = [
+    "fastapi>=0.116.1",
+    "uvicorn>=0.35.0",
+    "sqlalchemy>=2.0.43",
+    "asyncpg>=0.29.0",
+    "pydantic>=2.11.7",
+    "pydantic-settings>=2.7.0",
+    "email-validator>=2.2.0",
+]
+
+[tool.ruff]
+# Excluir directorios que no queremos analizar
+exclude = [
+    ".venv",
+    "venv",
+    "env",
+    "__pycache__",
+    ".pytest_cache",
+    ".mypy_cache",
+    "build",
+    "dist",
+    ".git",
+    "node_modules",
+    "data",
+]
+
+# Solo analizar archivos Python en el directorio del proyecto
+include = ["*.py", "app/**/*.py", "main.py"]
+
+# Configuración de líneas
+line-length = 88
+target-version = "py312"
+
+[tool.ruff.lint]
+# Reglas a aplicar
+select = [
+    "E",   # pycodestyle errors
+    "W",   # pycodestyle warnings
+    "F",   # pyflakes
+    "I",   # isort
+    "N",   # pep8-naming
+    "UP",  # pyupgrade
+    "B",   # flake8-bugbear
+]
+
+# Reglas a ignorar
+ignore = [
+    "E501",  # line too long (manejado por formatter)
+    "B008",  # do not perform function calls in argument defaults
+]
+
+[tool.ruff.lint.per-file-ignores]
+# Ignorar reglas específicas en archivos de configuración
+"main.py" = ["F401"]  # unused imports
+"app/__init__.py" = ["F401"]
+"app/schemas.py" = ["N805"]  # Pydantic validators use cls parameter
+
+[tool.ruff.format]
+# Usar comillas dobles
+quote-style = "double"
+# Mantener trailing commas
+skip-magic-trailing-comma = false
+
+[tool.pylsp-mypy]
+enabled = true
+live_mode = true
+strict = false
+
+[tool.pyright]
+include = ["app", "main.py"]
+exclude = [
+    ".venv",
+    "**/.venv",
+    "**/venv",
+    "**/__pycache__",
+    "**/node_modules",
+]
+venvPath = "."
+venv = ".venv"
+pythonVersion = "3.12"

@@ -13,3 +13,28 @@ email-validator==2.2.0
 
 # Configuraciones
 pydantic-settings==2.7.0
+
+# Autenticación y seguridad
+python-jose[cryptography]==3.3.0
+passlib[bcrypt]==1.7.4
+python-multipart==0.0.9
+
+# Cache y Redis
+redis==5.1.1
+
+# Logging estructurado
+python-json-logger==2.0.7
+
+# Security headers
+secure==0.3.0
+
+# System monitoring
+psutil==6.0.0
+
+# Production optimizations
+uvloop==0.20.1
+httptools==0.6.4
+
+# Optional monitoring integrations
+# sentry-sdk[fastapi]==1.45.1
+# newrelic==9.13.0

@@ -1,0 +1,52 @@
+# Render Blueprint for E-commerce API
+services:
+  - type: web
+    name: ecommerce-api
+    env: python
+    plan: starter
+    buildCommand: "pip install -r requirements.txt"
+    startCommand: "uvicorn main:app --host 0.0.0.0 --port $PORT --workers 4"
+    healthCheckPath: "/health/ready"
+    
+    envVars:
+      - key: APP_ENV
+        value: production
+      - key: PYTHON_VERSION
+        value: "3.12"
+      - key: APP_NAME
+        value: "E-commerce API"
+      - key: APP_VERSION
+        value: "1.0.0"
+      - key: DEBUG
+        value: "false"
+      - key: SECRET_KEY
+        generateValue: true
+      - key: ACCESS_TOKEN_EXPIRE_MINUTES
+        value: "30"
+      - key: REFRESH_TOKEN_EXPIRE_DAYS
+        value: "30"
+      - key: RATE_LIMIT_REQUESTS
+        value: "100"
+      - key: RATE_LIMIT_WINDOW
+        value: "60"
+      - key: LOG_LEVEL
+        value: "INFO"
+
+  - type: postgres
+    name: ecommerce-db
+    plan: starter
+    databaseName: ecommerce_db
+    databaseUser: ecommerce_user
+
+  - type: redis
+    name: ecommerce-redis
+    plan: starter
+
+# Auto-deployment from GitHub
+repo: https://github.com/your-username/ecommerce-api
+branch: main
+autoDeploy: true
+
+# Domain configuration (optional)
+# domains:
+#   - name: api.yourdomain.com
