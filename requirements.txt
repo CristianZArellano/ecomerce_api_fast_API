@@ -32,7 +32,7 @@ secure==0.3.0
 psutil==6.0.0
 
 # Production optimizations
-uvloop==0.20.1
+uvloop==0.21.0
 httptools==0.6.4
 
 # Optional monitoring integrations
