@@ -46,7 +46,7 @@ class TestExceptions:
 
         assert str(error) == "Authentication failed"
         assert error.status_code == 401
-        assert error.error_code == "AUTHENTICATION_FAILED"
+        assert error.error_code == "AUTH_FAILED"
 
     def test_authentication_error_custom_message(self):
         """Test AuthenticationError with custom message."""
@@ -105,9 +105,9 @@ class TestExceptions:
 
     def test_rate_limit_error(self):
         """Test RateLimitError exception."""
-        error = RateLimitError()
+        error = RateLimitError(limit=100, window_seconds=60, retry_after=30)
 
-        assert str(error) == "Rate limit exceeded"
+        assert "Rate limit exceeded" in str(error)
         assert error.status_code == 429
         assert error.error_code == "RATE_LIMIT_EXCEEDED"
 

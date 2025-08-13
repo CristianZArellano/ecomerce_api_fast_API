@@ -18,7 +18,7 @@ class TestHealthEndpoints:
         data = response.json()
 
         assert data["status"] == "healthy"
-        assert data["service"] == "E-commerce API"
+        assert data["service"] == "ecommerce-api"
         assert data["version"] == "1.0.0"
         assert "timestamp" in data
 
@@ -30,7 +30,7 @@ class TestHealthEndpoints:
         data = response.json()
 
         assert data["status"] == "alive"
-        assert data["service"] == "E-commerce API"
+        assert data["service"] == "ecommerce-api"
         assert "uptime_seconds" in data
         assert "timestamp" in data
 

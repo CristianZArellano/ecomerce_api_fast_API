@@ -1,5 +1,6 @@
 from functools import lru_cache
 
+from pydantic import model_validator
 from pydantic_settings import BaseSettings
 
 
@@ -28,6 +29,13 @@ class Settings(BaseSettings):
     # Rate Limiting (nueva configuración)
     RATE_LIMIT_REQUESTS: int = 100
     RATE_LIMIT_WINDOW: int = 60  # segundos
+
+    @model_validator(mode="after")
+    def validate_production_settings(self):
+        # Auto-set DEBUG to False for production environment
+        if self.APP_ENV == "production":
+            self.DEBUG = False
+        return self
 
     @property
     def database_url(self) -> str:

@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from pydantic import BaseModel, EmailStr, Field, validator
+from pydantic import BaseModel, EmailStr, Field, field_validator
 
 # ============= ESQUEMAS DE AUTENTICACIÓN =============
 
@@ -19,7 +19,8 @@ class UserRegister(BaseModel):
     email: EmailStr
     password: str = Field(..., min_length=6, max_length=100)
 
-    @validator("name")
+    @field_validator("name")
+    @classmethod
     def validate_name(cls, v):
         if not v.strip():
             raise ValueError("El nombre no puede estar vacío")
@@ -117,14 +118,16 @@ class ProductBase(BaseModel):
     sku: str | None = Field(None, max_length=50)
     weight: float | None = Field(None, gt=0)
 
-    @validator("price")
+    @field_validator("price")
+    @classmethod
     def validate_price(cls, v):
         if v <= 0:
             raise ValueError("El precio debe ser mayor que 0")
         # Redondear a 2 decimales
         return round(v, 2)
 
-    @validator("name")
+    @field_validator("name")
+    @classmethod
     def validate_name(cls, v):
         if not v.strip():
             raise ValueError("El nombre no puede estar vacío")

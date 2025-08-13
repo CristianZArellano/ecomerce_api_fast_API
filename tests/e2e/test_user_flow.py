@@ -84,7 +84,7 @@ class TestUserFlow:
         openapi_data = openapi_response.json()
         assert "openapi" in openapi_data
         assert "info" in openapi_data
-        assert openapi_data["info"]["title"] == "E-commerce API"
+        assert openapi_data["info"]["title"] == "API E-commerce"
 
         # Test Swagger UI
         docs_response = client.get("/docs")

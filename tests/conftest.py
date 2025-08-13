@@ -23,15 +23,11 @@ TEST_DATABASE_URL = "sqlite+aiosqlite:///:memory:"
 TEST_DATABASE_URL_SYNC = "sqlite:///:memory:"
 
 
-@pytest.fixture(scope="session")
-def event_loop() -> Generator[asyncio.AbstractEventLoop, None, None]:
-    """Create an instance of the default event loop for the test session."""
-    loop = asyncio.get_event_loop_policy().new_event_loop()
-    yield loop
-    loop.close()
+# Removed custom event_loop fixture to avoid deprecation warning
+# pytest-asyncio will provide its own event_loop fixture
 
 
-@pytest.fixture
+@pytest.fixture(scope="function")
 async def async_engine():
     """Create async test database engine."""
     engine = create_async_engine(
@@ -48,7 +44,7 @@ async def async_engine():
     await engine.dispose()
 
 
-@pytest.fixture
+@pytest.fixture(scope="function")
 async def async_session(async_engine) -> AsyncGenerator[AsyncSession, None]:
     """Create async test database session."""
     async_session_maker = sessionmaker(
@@ -59,7 +55,7 @@ async def async_session(async_engine) -> AsyncGenerator[AsyncSession, None]:
         yield session
 
 
-@pytest.fixture
+@pytest.fixture(scope="function")
 def sync_engine():
     """Create sync test database engine."""
     engine = create_engine(
@@ -74,7 +70,7 @@ def sync_engine():
     engine.dispose()
 
 
-@pytest.fixture
+@pytest.fixture(scope="function")
 def sync_session(sync_engine) -> Generator[Session, None, None]:
     """Create sync test database session."""
     testing_session_local = sessionmaker(
@@ -202,7 +198,7 @@ async def test_products(async_session: AsyncSession) -> list[Product]:
 
 
 @pytest.fixture
-def auth_headers(test_user: User) -> dict[str, str]:
+async def auth_headers(test_user: User) -> dict[str, str]:
     """Generate authentication headers for test user."""
     from app.auth import create_access_token
 
@@ -213,7 +209,7 @@ def auth_headers(test_user: User) -> dict[str, str]:
 
 
 @pytest.fixture
-def admin_auth_headers(admin_user: User) -> dict[str, str]:
+async def admin_auth_headers(admin_user: User) -> dict[str, str]:
     """Generate authentication headers for admin user."""
     from app.auth import create_access_token
 
