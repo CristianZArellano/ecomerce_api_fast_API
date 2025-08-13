@@ -3,8 +3,7 @@ Shared pytest fixtures for the E-commerce API tests.
 """
 
 import asyncio
-import os
-from typing import AsyncGenerator, Generator
+from collections.abc import AsyncGenerator, Generator
 
 import pytest
 from fastapi.testclient import TestClient
@@ -15,11 +14,9 @@ from sqlalchemy.orm import Session, sessionmaker
 from sqlalchemy.pool import StaticPool
 
 # Import your app and dependencies
-from app.config import get_settings
 from app.database import Base, get_database
 from app.models import Product, User
 from main import app
-
 
 # Test database configuration
 TEST_DATABASE_URL = "sqlite+aiosqlite:///:memory:"
@@ -42,12 +39,12 @@ async def async_engine():
         poolclass=StaticPool,
         connect_args={"check_same_thread": False},
     )
-    
+
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
-    
+
     yield engine
-    
+
     await engine.dispose()
 
 
@@ -57,7 +54,7 @@ async def async_session(async_engine) -> AsyncGenerator[AsyncSession, None]:
     async_session_maker = sessionmaker(
         async_engine, class_=AsyncSession, expire_on_commit=False
     )
-    
+
     async with async_session_maker() as session:
         yield session
 
@@ -70,21 +67,21 @@ def sync_engine():
         poolclass=StaticPool,
         connect_args={"check_same_thread": False},
     )
-    
+
     Base.metadata.create_all(engine)
     yield engine
-    
+
     engine.dispose()
 
 
 @pytest.fixture
 def sync_session(sync_engine) -> Generator[Session, None, None]:
     """Create sync test database session."""
-    TestingSessionLocal = sessionmaker(
+    testing_session_local = sessionmaker(
         autocommit=False, autoflush=False, bind=sync_engine
     )
-    
-    session = TestingSessionLocal()
+
+    session = testing_session_local()
     try:
         yield session
     finally:
@@ -96,7 +93,7 @@ def override_get_db(async_session: AsyncSession):
     """Override database dependency for testing."""
     async def _override_get_db():
         yield async_session
-    
+
     return _override_get_db
 
 
@@ -130,7 +127,7 @@ async def test_user(async_session: AsyncSession) -> User:
     """Create a test user."""
     from app.crud import create_user
     from app.schemas import UserCreate
-    
+
     user_data = UserCreate(
         name="Test User",
         email="test@example.com",
@@ -147,7 +144,7 @@ async def admin_user(async_session: AsyncSession) -> User:
     """Create a test admin user."""
     from app.crud import create_user
     from app.schemas import UserCreate
-    
+
     user_data = UserCreate(
         name="Admin User",
         email="admin@example.com",
@@ -178,7 +175,7 @@ async def test_products(async_session: AsyncSession) -> list[Product]:
             description="A modern test smartphone",
             price=699.99,
             stock=5,
-            category="Electronics", 
+            category="Electronics",
             sku="TEST-PHN-001",
             is_active=True
         ),
@@ -192,15 +189,15 @@ async def test_products(async_session: AsyncSession) -> list[Product]:
             is_active=True
         )
     ]
-    
+
     for product in products:
         async_session.add(product)
-    
+
     await async_session.commit()
-    
+
     for product in products:
         await async_session.refresh(product)
-    
+
     return products
 
 
@@ -208,7 +205,7 @@ async def test_products(async_session: AsyncSession) -> list[Product]:
 def auth_headers(test_user: User) -> dict[str, str]:
     """Generate authentication headers for test user."""
     from app.auth import create_access_token
-    
+
     access_token = create_access_token(
         data={"sub": str(test_user.id), "email": test_user.email}
     )
@@ -219,8 +216,9 @@ def auth_headers(test_user: User) -> dict[str, str]:
 def admin_auth_headers(admin_user: User) -> dict[str, str]:
     """Generate authentication headers for admin user."""
     from app.auth import create_access_token
-    
+
     access_token = create_access_token(
         data={"sub": str(admin_user.id), "email": admin_user.email}
     )
     return {"Authorization": f"Bearer {access_token}"}
+

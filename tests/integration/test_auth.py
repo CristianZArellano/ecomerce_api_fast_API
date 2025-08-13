@@ -4,7 +4,6 @@ Integration tests for authentication endpoints.
 
 import pytest
 from fastapi.testclient import TestClient
-from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.models import User
 
@@ -20,12 +19,12 @@ class TestAuthenticationEndpoints:
             "email": "newuser@example.com",
             "password": "securepassword123"
         }
-        
+
         response = client.post("/auth/register", json=user_data)
-        
+
         assert response.status_code == 201
         data = response.json()
-        
+
         assert data["message"] == "User registered successfully"
         assert "user" in data
         assert data["user"]["email"] == user_data["email"]
@@ -35,16 +34,16 @@ class TestAuthenticationEndpoints:
     def test_user_registration_duplicate_email(self, client: TestClient, test_user: User):
         """Test registration with duplicate email."""
         user_data = {
-            "name": "Another User", 
+            "name": "Another User",
             "email": test_user.email,  # Same email as existing user
             "password": "securepassword123"
         }
-        
+
         response = client.post("/auth/register", json=user_data)
-        
+
         assert response.status_code == 409
         data = response.json()
-        
+
         assert data["error_code"] == "USER_ALREADY_EXISTS"
 
     def test_user_registration_invalid_email(self, client: TestClient):
@@ -54,12 +53,12 @@ class TestAuthenticationEndpoints:
             "email": "invalid-email",
             "password": "securepassword123"
         }
-        
+
         response = client.post("/auth/register", json=user_data)
-        
+
         assert response.status_code == 422
         data = response.json()
-        
+
         assert "detail" in data
         # Check validation error details
         assert any("email" in str(error).lower() for error in data["detail"])
@@ -70,12 +69,12 @@ class TestAuthenticationEndpoints:
             "email": test_user.email,
             "password": "testpassword123"  # From fixture
         }
-        
+
         response = client.post("/auth/login", json=login_data)
-        
+
         assert response.status_code == 200
         data = response.json()
-        
+
         assert "access_token" in data
         assert "refresh_token" in data
         assert data["token_type"] == "bearer"
@@ -88,12 +87,12 @@ class TestAuthenticationEndpoints:
             "email": test_user.email,
             "password": "wrongpassword"
         }
-        
+
         response = client.post("/auth/login", json=login_data)
-        
+
         assert response.status_code == 401
         data = response.json()
-        
+
         assert data["error_code"] == "INVALID_CREDENTIALS"
 
     def test_user_login_nonexistent_user(self, client: TestClient):
@@ -102,21 +101,21 @@ class TestAuthenticationEndpoints:
             "email": "nonexistent@example.com",
             "password": "somepassword"
         }
-        
+
         response = client.post("/auth/login", json=login_data)
-        
+
         assert response.status_code == 401
         data = response.json()
-        
+
         assert data["error_code"] == "INVALID_CREDENTIALS"
 
     def test_get_user_profile_authenticated(self, client: TestClient, auth_headers: dict):
         """Test getting user profile with valid authentication."""
         response = client.get("/auth/me", headers=auth_headers)
-        
+
         assert response.status_code == 200
         data = response.json()
-        
+
         assert "email" in data
         assert "name" in data
         assert "is_active" in data
@@ -125,20 +124,20 @@ class TestAuthenticationEndpoints:
     def test_get_user_profile_unauthenticated(self, client: TestClient):
         """Test getting user profile without authentication."""
         response = client.get("/auth/me")
-        
+
         assert response.status_code == 401
         data = response.json()
-        
+
         assert "detail" in data
 
     def test_get_user_profile_invalid_token(self, client: TestClient):
         """Test getting user profile with invalid token."""
         headers = {"Authorization": "Bearer invalid_token"}
         response = client.get("/auth/me", headers=headers)
-        
+
         assert response.status_code == 401
         data = response.json()
-        
+
         assert "detail" in data
 
     @pytest.mark.asyncio
@@ -149,20 +148,20 @@ class TestAuthenticationEndpoints:
             "email": test_user.email,
             "password": "testpassword123"
         }
-        
+
         login_response = await async_client.post("/auth/login", json=login_data)
         assert login_response.status_code == 200
-        
+
         login_data = login_response.json()
         refresh_token = login_data["refresh_token"]
-        
+
         # Now refresh the token
         refresh_data = {"refresh_token": refresh_token}
         response = await async_client.post("/auth/refresh", json=refresh_data)
-        
+
         assert response.status_code == 200
         data = response.json()
-        
+
         assert "access_token" in data
         assert "refresh_token" in data
         assert data["token_type"] == "bearer"
@@ -171,8 +170,9 @@ class TestAuthenticationEndpoints:
         """Test token refresh with invalid refresh token."""
         refresh_data = {"refresh_token": "invalid_refresh_token"}
         response = client.post("/auth/refresh", json=refresh_data)
-        
+
         assert response.status_code == 401
         data = response.json()
-        
+
         assert "detail" in data or "error_code" in data
+

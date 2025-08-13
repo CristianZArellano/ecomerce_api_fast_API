@@ -6,14 +6,11 @@ import pytest
 from pydantic import ValidationError
 
 from app.schemas import (
-    ProductBase,
-    UserBase,
-    UserCreate,
-    UserRegister,
-    UserProfile,
-    TokenResponse,
     PaginationParams,
-    ProductUpdate,
+    ProductBase,
+    TokenResponse,
+    UserProfile,
+    UserRegister,
 )
 
 
@@ -29,7 +26,7 @@ class TestUserSchemas:
             "password": "securepassword123"
         }
         user = UserRegister(**user_data)
-        
+
         assert user.name == "John Doe"
         assert user.email == "john@example.com"
         assert user.password == "securepassword123"
@@ -41,10 +38,10 @@ class TestUserSchemas:
             "email": "invalid-email",
             "password": "securepassword123"
         }
-        
+
         with pytest.raises(ValidationError) as exc_info:
             UserRegister(**user_data)
-        
+
         assert "value is not a valid email address" in str(exc_info.value)
 
     def test_user_register_short_password(self):
@@ -54,16 +51,16 @@ class TestUserSchemas:
             "email": "john@example.com",
             "password": "123"  # Too short
         }
-        
+
         with pytest.raises(ValidationError) as exc_info:
             UserRegister(**user_data)
-        
+
         assert "at least 6 characters" in str(exc_info.value)
 
     def test_user_profile_schema(self):
         """Test UserProfile schema."""
         from datetime import datetime
-        
+
         user_data = {
             "id": 1,
             "name": "John Doe",
@@ -74,7 +71,7 @@ class TestUserSchemas:
             "updated_at": datetime.now()
         }
         user = UserProfile(**user_data)
-        
+
         assert hasattr(user, "email")
         assert hasattr(user, "name")
         assert hasattr(user, "is_active")
@@ -93,7 +90,7 @@ class TestProductSchemas:
             "category": "Electronics"
         }
         product = ProductBase(**product_data)
-        
+
         assert product.name == "Test Laptop"
         assert product.price == 1299.99
         assert product.category == "Electronics"
@@ -105,14 +102,14 @@ class TestProductSchemas:
             "limit": 50
         }
         pagination = PaginationParams(**pagination_data)
-        
+
         assert pagination.skip == 0
         assert pagination.limit == 50
 
     def test_pagination_params_defaults(self):
         """Test pagination parameters with defaults."""
         pagination = PaginationParams()
-        
+
         assert pagination.skip == 0
         assert pagination.limit == 100
 
@@ -130,8 +127,9 @@ class TestTokenSchemas:
             "expires_in": 3600
         }
         token = TokenResponse(**token_data)
-        
+
         assert token.access_token.startswith("eyJ")
         assert token.refresh_token.startswith("eyJ")
         assert token.token_type == "bearer"
         assert token.expires_in == 3600
+
