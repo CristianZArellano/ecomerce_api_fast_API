@@ -183,7 +183,7 @@ def custom_openapi():
     return app.openapi_schema
 
 
-app.openapi = custom_openapi
+app.openapi = lambda: custom_openapi()  # type: ignore
 
 # Configurar CORS seguro
 cors_origins = []

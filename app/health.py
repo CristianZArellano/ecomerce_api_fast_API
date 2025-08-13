@@ -4,7 +4,7 @@ Health check endpoints para monitoreo
 
 import asyncio
 import time
-from typing import Any
+from typing import Any, Union
 
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy import text
@@ -93,20 +93,23 @@ async def detailed_health_check(db: AsyncSession = Depends(get_database)):
     redis_task = asyncio.create_task(_check_redis_detailed())
     system_task = asyncio.create_task(_check_system())
 
-    db_result, redis_result, system_result = await asyncio.gather(
+    results = await asyncio.gather(
         db_task, redis_task, system_task, return_exceptions=True
     )
+    db_result: Union[dict[str, Any], BaseException] = results[0]
+    redis_result: Union[dict[str, Any], BaseException] = results[1]
+    system_result: Union[dict[str, Any], BaseException] = results[2]
 
     # Determinar estado general
     checks = {
         "database": db_result
-        if not isinstance(db_result, Exception)
+        if not isinstance(db_result, BaseException)
         else {"healthy": False, "error": str(db_result)},
         "redis": redis_result
-        if not isinstance(redis_result, Exception)
+        if not isinstance(redis_result, BaseException)
         else {"healthy": False, "error": str(redis_result)},
         "system": system_result
-        if not isinstance(system_result, Exception)
+        if not isinstance(system_result, BaseException)
         else {"healthy": False, "error": str(system_result)},
     }
 

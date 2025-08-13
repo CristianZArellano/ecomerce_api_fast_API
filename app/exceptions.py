@@ -76,7 +76,7 @@ class UserNotFoundError(UserError):
     """Usuario no encontrado"""
 
     def __init__(self, user_id: int | None = None, email: str | None = None):
-        details = {}
+        details: dict[str, Any] = {}
         if user_id:
             details["user_id"] = user_id
         if email:
@@ -132,7 +132,7 @@ class ProductNotFoundError(ProductError):
     """Producto no encontrado"""
 
     def __init__(self, product_id: int | None = None, sku: str | None = None):
-        details = {}
+        details: dict[str, Any] = {}
         if product_id:
             details["product_id"] = product_id
         if sku:

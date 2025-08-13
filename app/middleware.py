@@ -1,6 +1,6 @@
 import time
 import uuid
-from collections.abc import Callable
+from collections.abc import Awaitable, Callable
 
 from fastapi import Request, Response
 from fastapi.responses import JSONResponse
@@ -24,7 +24,7 @@ class LoggingMiddleware(BaseHTTPMiddleware):
         super().__init__(app)
         self.logger = get_logger(logger_name)
 
-    async def dispatch(self, request: Request, call_next: Callable) -> Response:
+    async def dispatch(self, request: Request, call_next: Callable[[Request], Awaitable[Response]]) -> Response:
         # Generar ID único para el request
         request_id = str(uuid.uuid4())
         request.state.request_id = request_id
@@ -102,7 +102,7 @@ class RateLimitMiddleware(BaseHTTPMiddleware):
             "default": {"limit": 100, "window": 60}           # 100 requests por minuto
         }
 
-    async def dispatch(self, request: Request, call_next: Callable) -> Response:
+    async def dispatch(self, request: Request, call_next: Callable[[Request], Awaitable[Response]]) -> Response:
         # Obtener IP del cliente
         client_ip = self._get_client_ip(request)
         endpoint = str(request.url.path)
@@ -180,7 +180,7 @@ class RateLimitMiddleware(BaseHTTPMiddleware):
 class SecurityHeadersMiddleware(BaseHTTPMiddleware):
     """Middleware para agregar headers de seguridad"""
 
-    async def dispatch(self, request: Request, call_next: Callable) -> Response:
+    async def dispatch(self, request: Request, call_next: Callable[[Request], Awaitable[Response]]) -> Response:
         response = await call_next(request)
 
         # Headers de seguridad
@@ -216,7 +216,7 @@ class ErrorHandlerMiddleware(BaseHTTPMiddleware):
         super().__init__(app)
         self.logger = get_logger(logger_name)
 
-    async def dispatch(self, request: Request, call_next: Callable) -> Response:
+    async def dispatch(self, request: Request, call_next: Callable[[Request], Awaitable[Response]]) -> Response:
         try:
             return await call_next(request)
         except EcommerceError as exc:
