@@ -4,7 +4,7 @@ Excepciones personalizadas para la API E-commerce
 from typing import Any
 
 
-class EcommerceException(Exception):
+class EcommerceError(Exception):
     """Excepción base para la aplicación"""
 
     def __init__(
@@ -22,7 +22,7 @@ class EcommerceException(Exception):
 
 
 # Excepciones de autenticación
-class AuthenticationException(EcommerceException):
+class AuthenticationError(EcommerceError):
     """Errores de autenticación"""
 
     def __init__(self, message: str = "Authentication failed", details: dict[str, Any] | None = None):
@@ -34,7 +34,7 @@ class AuthenticationException(EcommerceException):
         )
 
 
-class InvalidTokenException(AuthenticationException):
+class InvalidTokenError(AuthenticationError):
     """Token inválido o expirado"""
 
     def __init__(self, message: str = "Invalid or expired token"):
@@ -44,7 +44,7 @@ class InvalidTokenException(AuthenticationException):
         )
 
 
-class TokenExpiredException(AuthenticationException):
+class TokenExpiredError(AuthenticationError):
     """Token expirado"""
 
     def __init__(self, message: str = "Token has expired"):
@@ -54,7 +54,7 @@ class TokenExpiredException(AuthenticationException):
         )
 
 
-class AuthorizationException(EcommerceException):
+class AuthorizationError(EcommerceError):
     """Errores de autorización"""
 
     def __init__(self, message: str = "Insufficient permissions", details: dict[str, Any] | None = None):
@@ -67,12 +67,12 @@ class AuthorizationException(EcommerceException):
 
 
 # Excepciones de usuario
-class UserException(EcommerceException):
+class UserError(EcommerceError):
     """Errores relacionados con usuarios"""
     pass
 
 
-class UserNotFoundException(UserException):
+class UserNotFoundError(UserError):
     """Usuario no encontrado"""
 
     def __init__(self, user_id: int | None = None, email: str | None = None):
@@ -90,7 +90,7 @@ class UserNotFoundException(UserException):
         )
 
 
-class UserAlreadyExistsException(UserException):
+class UserAlreadyExistsError(UserError):
     """Usuario ya existe"""
 
     def __init__(self, email: str):
@@ -102,7 +102,7 @@ class UserAlreadyExistsException(UserException):
         )
 
 
-class InvalidCredentialsException(AuthenticationException):
+class InvalidCredentialsError(AuthenticationError):
     """Credenciales inválidas"""
 
     def __init__(self, message: str = "Invalid email or password"):
@@ -112,7 +112,7 @@ class InvalidCredentialsException(AuthenticationException):
         )
 
 
-class UserInactiveException(AuthenticationException):
+class UserInactiveError(AuthenticationError):
     """Usuario inactivo"""
 
     def __init__(self, user_id: int):
@@ -123,12 +123,12 @@ class UserInactiveException(AuthenticationException):
 
 
 # Excepciones de productos
-class ProductException(EcommerceException):
+class ProductError(EcommerceError):
     """Errores relacionados con productos"""
     pass
 
 
-class ProductNotFoundException(ProductException):
+class ProductNotFoundError(ProductError):
     """Producto no encontrado"""
 
     def __init__(self, product_id: int | None = None, sku: str | None = None):
@@ -146,7 +146,7 @@ class ProductNotFoundException(ProductException):
         )
 
 
-class ProductAlreadyExistsException(ProductException):
+class ProductAlreadyExistsError(ProductError):
     """Producto ya existe"""
 
     def __init__(self, sku: str):
@@ -158,7 +158,7 @@ class ProductAlreadyExistsException(ProductException):
         )
 
 
-class InsufficientStockException(ProductException):
+class InsufficientStockError(ProductError):
     """Stock insuficiente"""
 
     def __init__(self, product_id: int, requested: int, available: int):
@@ -174,7 +174,7 @@ class InsufficientStockException(ProductException):
         )
 
 
-class ProductNotAvailableException(ProductException):
+class ProductNotAvailableError(ProductError):
     """Producto no disponible"""
 
     def __init__(self, product_id: int):
@@ -187,7 +187,7 @@ class ProductNotAvailableException(ProductException):
 
 
 # Excepciones de validación
-class ValidationException(EcommerceException):
+class ValidationError(EcommerceError):
     """Errores de validación"""
 
     def __init__(self, message: str, field: str | None = None, details: dict[str, Any] | None = None):
@@ -203,7 +203,7 @@ class ValidationException(EcommerceException):
         )
 
 
-class InvalidEmailFormatException(ValidationException):
+class InvalidEmailFormatError(ValidationError):
     """Formato de email inválido"""
 
     def __init__(self, email: str):
@@ -214,7 +214,7 @@ class InvalidEmailFormatException(ValidationException):
         )
 
 
-class PasswordTooWeakException(ValidationException):
+class PasswordTooWeakError(ValidationError):
     """Contraseña demasiado débil"""
 
     def __init__(self, requirements: dict[str, bool]):
@@ -226,7 +226,7 @@ class PasswordTooWeakException(ValidationException):
 
 
 # Excepciones de rate limiting
-class RateLimitException(EcommerceException):
+class RateLimitError(EcommerceError):
     """Rate limit excedido"""
 
     def __init__(self, limit: int, window_seconds: int, retry_after: int):
@@ -243,7 +243,7 @@ class RateLimitException(EcommerceException):
 
 
 # Excepciones de base de datos
-class DatabaseException(EcommerceException):
+class DatabaseError(EcommerceError):
     """Errores de base de datos"""
 
     def __init__(self, message: str = "Database operation failed", details: dict[str, Any] | None = None):
@@ -255,7 +255,7 @@ class DatabaseException(EcommerceException):
         )
 
 
-class DatabaseConnectionException(DatabaseException):
+class DatabaseConnectionError(DatabaseError):
     """Error de conexión a la base de datos"""
 
     def __init__(self, message: str = "Could not connect to database"):
@@ -265,7 +265,7 @@ class DatabaseConnectionException(DatabaseException):
         )
 
 
-class DatabaseTimeoutException(DatabaseException):
+class DatabaseTimeoutError(DatabaseError):
     """Timeout de base de datos"""
 
     def __init__(self, operation: str, timeout_seconds: int):
@@ -280,7 +280,7 @@ class DatabaseTimeoutException(DatabaseException):
 
 
 # Excepciones de cache
-class CacheException(EcommerceException):
+class CacheError(EcommerceError):
     """Errores de cache"""
 
     def __init__(self, message: str = "Cache operation failed", details: dict[str, Any] | None = None):
@@ -292,7 +292,7 @@ class CacheException(EcommerceException):
         )
 
 
-class CacheConnectionException(CacheException):
+class CacheConnectionError(CacheError):
     """Error de conexión al cache"""
 
     def __init__(self, message: str = "Could not connect to cache server"):
@@ -303,7 +303,7 @@ class CacheConnectionException(CacheException):
 
 
 # Excepciones de negocio
-class BusinessLogicException(EcommerceException):
+class BusinessLogicError(EcommerceError):
     """Errores de lógica de negocio"""
 
     def __init__(self, message: str, details: dict[str, Any] | None = None):
@@ -315,12 +315,12 @@ class BusinessLogicException(EcommerceException):
         )
 
 
-class OrderException(BusinessLogicException):
+class OrderError(BusinessLogicError):
     """Errores relacionados con órdenes"""
     pass
 
 
-class PaymentException(BusinessLogicException):
+class PaymentError(BusinessLogicError):
     """Errores de pago"""
 
     def __init__(self, message: str, payment_id: str | None = None, details: dict[str, Any] | None = None):
@@ -334,7 +334,7 @@ class PaymentException(BusinessLogicException):
         )
 
 
-class ExternalServiceException(EcommerceException):
+class ExternalServiceError(EcommerceError):
     """Errores de servicios externos"""
 
     def __init__(self, service_name: str, message: str = "External service error",
@@ -350,7 +350,7 @@ class ExternalServiceException(EcommerceException):
         )
 
 
-class ConfigurationException(EcommerceException):
+class ConfigurationError(EcommerceError):
     """Errores de configuración"""
 
     def __init__(self, message: str, config_key: str | None = None):

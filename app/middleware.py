@@ -6,7 +6,7 @@ from fastapi import Request, Response
 from fastapi.responses import JSONResponse
 from starlette.middleware.base import BaseHTTPMiddleware
 
-from app.exceptions import EcommerceException, RateLimitException
+from app.exceptions import EcommerceError, RateLimitError
 from app.logging_config import (
     get_logger,
     log_error,
@@ -132,7 +132,7 @@ class RateLimitMiddleware(BaseHTTPMiddleware):
                     }
                 )
 
-                raise RateLimitException(
+                raise RateLimitError(
                     limit=limits["limit"],
                     window_seconds=limits["window"],
                     retry_after=rate_limit_result["reset_time"] - int(time.time())
@@ -146,7 +146,7 @@ class RateLimitMiddleware(BaseHTTPMiddleware):
 
             return response
 
-        except RateLimitException:
+        except RateLimitError:
             # Re-raise rate limit exceptions
             raise
         except Exception as exc:
@@ -219,7 +219,7 @@ class ErrorHandlerMiddleware(BaseHTTPMiddleware):
     async def dispatch(self, request: Request, call_next: Callable) -> Response:
         try:
             return await call_next(request)
-        except EcommerceException as exc:
+        except EcommerceError as exc:
             # Errores de aplicación - ya están bien formateados
             return JSONResponse(
                 status_code=exc.status_code,
@@ -274,11 +274,11 @@ class ErrorHandlerMiddleware(BaseHTTPMiddleware):
                 }
             )
 
-    def _get_error_headers(self, exc: EcommerceException) -> dict:
+    def _get_error_headers(self, exc: EcommerceError) -> dict:
         """Obtener headers específicos para ciertos tipos de error"""
         headers = {}
 
-        if isinstance(exc, RateLimitException):
+        if isinstance(exc, RateLimitError):
             headers["Retry-After"] = str(exc.details.get("retry_after", 60))
 
         return headers
